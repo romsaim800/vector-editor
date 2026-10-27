@@ -6,40 +6,154 @@
 <title>Vector Editor</title>
 <style>
   html, body { margin:0; height:100%; font-family:sans-serif; overflow:hidden; }
-  body { display:flex; flex-direction:column; background:#ccc; }
-  svg { flex:1; min-height:0; width:100%; background:#fff; touch-action:none; display:block; }
-  #bar { display:flex; gap:6px; padding:8px; background:#222; align-items:center; flex-wrap:wrap; }
-  button { min-width:48px; min-height:48px; padding:0 10px; font-size:15px; border:0; border-radius:8px; background:#555; color:#fff; }
-  button.on { background:#2a7de1; }
+  body { display:flex; flex-direction:column; background:#1b1b1b; color:#fff; }
+  #info { padding:8px 12px; font-size:13px; background:#111; color:#bbb; min-height:18px; }
+  #stage { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; background:#5a5a5a; overflow:hidden; }
+  #c { display:block; background:#fff; touch-action:none; box-shadow:0 2px 12px rgba(0,0,0,.5); }
+  #bar { display:flex; gap:6px; padding:8px; background:#222; align-items:center; flex-wrap:wrap; justify-content:center; }
+  .ib { width:48px; height:48px; border:0; border-radius:10px; background:#3a3a3a; color:#fff; display:flex; align-items:center; justify-content:center; padding:0; }
+  .ib.on { background:#2a7de1; }
+  .ib svg { width:24px; height:24px; }
   input[type=color] { width:48px; height:48px; border:0; padding:0; background:none; }
+  #dlg { position:fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,.65); display:flex; align-items:center; justify-content:center; z-index:10; }
+  #box { background:#262626; padding:16px; border-radius:12px; width:92vw; max-width:360px; position:relative; }
+  #box h3 { margin:0 0 12px; font-size:18px; }
+  #box label { display:block; font-size:13px; color:#bbb; margin:10px 0 4px; }
+  #box input, #box select { width:100%; box-sizing:border-box; min-height:44px; font-size:16px; padding:0 10px; border-radius:8px; border:1px solid #555; background:#111; color:#fff; }
+  .row { display:flex; gap:8px; }
+  .row > div { flex:1; }
+  #presets { display:flex; flex-wrap:wrap; gap:6px; }
+  #presets button { flex:1 1 45%; min-height:44px; border:0; border-radius:8px; background:#3a3a3a; color:#fff; font-size:14px; }
+  #create { width:100%; min-height:48px; margin-top:16px; border:0; border-radius:10px; background:#2a7de1; color:#fff; font-size:16px; }
+  #closeDlg { position:absolute; right:8px; top:8px; width:40px; height:40px; display:none; }
 </style>
 </head>
 <body>
-<svg id="c"><g id="art"></g><g id="ui"></g></svg>
-<div id="bar">
-  <button id="t-select" class="on">সিলেক্ট</button>
-  <button id="t-rect">চতুর্ভুজ</button>
-  <button id="t-ellipse">বৃত্ত</button>
-  <input type="color" id="color" value="#2a7de1">
-  <button id="del">মুছুন</button>
-  <button id="save">SVG সেভ</button>
+<div id="info"></div>
+<div id="stage">
+  <svg id="c"><rect id="bg" x="0" y="0" fill="#fff"/><g id="art"></g><g id="ui"></g></svg>
 </div>
+<div id="bar">
+  <button class="ib on" id="t-select" data-icon="select" title="সিলেক্ট" aria-label="সিলেক্ট"></button>
+  <button class="ib" id="t-rect" data-icon="rect" title="চতুর্ভুজ" aria-label="চতুর্ভুজ"></button>
+  <button class="ib" id="t-ellipse" data-icon="ellipse" title="বৃত্ত" aria-label="বৃত্ত"></button>
+  <input type="color" id="color" value="#2a7de1">
+  <button class="ib" id="del" data-icon="del" title="মুছুন" aria-label="মুছুন"></button>
+  <button class="ib" id="save" data-icon="save" title="SVG সেভ" aria-label="SVG সেভ"></button>
+  <button class="ib" id="newc" data-icon="newc" title="নতুন ক্যানভাস" aria-label="নতুন ক্যানভাস"></button>
+</div>
+
+<div id="dlg">
+  <div id="box">
+    <button class="ib" id="closeDlg" data-icon="close" aria-label="বন্ধ"></button>
+    <h3>নতুন ক্যানভাস</h3>
+    <div id="presets">
+      <button data-w="1080" data-h="1080" data-p="72">1080 × 1080</button>
+      <button data-w="1920" data-h="1080" data-p="72">1920 × 1080</button>
+      <button data-w="1080" data-h="1920" data-p="72">1080 × 1920</button>
+      <button data-w="2480" data-h="3508" data-p="300">A4 (300 PPI)</button>
+    </div>
+    <div class="row">
+      <div><label>প্রস্থ (px)</label><input type="number" id="w" value="1080"></div>
+      <div><label>উচ্চতা (px)</label><input type="number" id="h" value="1080"></div>
+    </div>
+    <label>রেজোলিউশন (PPI)</label>
+    <select id="ppi">
+      <option value="72">72</option>
+      <option value="150">150</option>
+      <option value="300">300</option>
+    </select>
+    <button id="create">তৈরি করুন</button>
+  </div>
+</div>
+
 <script>
 var NS = "http://www.w3.org/2000/svg";
 var svg = document.getElementById("c");
+var bg = document.getElementById("bg");
 var art = document.getElementById("art");
 var ui = document.getElementById("ui");
+var stage = document.getElementById("stage");
+var info = document.getElementById("info");
+var dlg = document.getElementById("dlg");
 var tool = "select", color = "#2a7de1", sel = null, drag = null;
+var W = 0, H = 0, PPI = 72;
+
+var ICONS = {
+  select: '<path d="M5 3l14 8-6 2-2 6z"/>',
+  rect: '<rect x="4" y="6" width="16" height="12" rx="1"/>',
+  ellipse: '<ellipse cx="12" cy="12" rx="9" ry="6"/>',
+  del: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  save: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+  newc: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>'
+};
+var btns = document.querySelectorAll("[data-icon]");
+for (var i = 0; i < btns.length; i++) {
+  btns[i].innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[btns[i].getAttribute("data-icon")] + '</svg>';
+}
+
+function fit() {
+  if (!W) return;
+  var r = stage.getBoundingClientRect();
+  var s = Math.min((r.width - 32) / W, (r.height - 32) / H);
+  svg.style.width = (W * s) + "px";
+  svg.style.height = (H * s) + "px";
+}
+window.addEventListener("resize", fit);
 
 function pt(e) {
   var r = svg.getBoundingClientRect();
-  return { x: e.clientX - r.left, y: e.clientY - r.top };
+  return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height };
 }
+
+function openDialog() {
+  document.getElementById("closeDlg").style.display = W ? "flex" : "none";
+  dlg.style.display = "flex";
+}
+
+function createCanvas(w, h, ppi) {
+  W = w; H = h; PPI = ppi;
+  svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+  bg.setAttribute("width", w);
+  bg.setAttribute("height", h);
+  art.innerHTML = "";
+  ui.innerHTML = "";
+  sel = null; drag = null;
+  info.textContent = W + " × " + H + " px · " + PPI + " PPI";
+  dlg.style.display = "none";
+  fit();
+}
+
+var presetBtns = document.querySelectorAll("#presets button");
+for (var j = 0; j < presetBtns.length; j++) {
+  presetBtns[j].onclick = function () {
+    document.getElementById("w").value = this.getAttribute("data-w");
+    document.getElementById("h").value = this.getAttribute("data-h");
+    document.getElementById("ppi").value = this.getAttribute("data-p");
+  };
+}
+
+document.getElementById("create").onclick = function () {
+  var w = parseInt(document.getElementById("w").value, 10);
+  var h = parseInt(document.getElementById("h").value, 10);
+  var p = parseInt(document.getElementById("ppi").value, 10);
+  if (!(w >= 16 && w <= 8000 && h >= 16 && h <= 8000)) {
+    alert("প্রস্থ ও উচ্চতা ১৬ থেকে ৮০০০ এর মধ্যে দিন।");
+    return;
+  }
+  createCanvas(w, h, p);
+};
+document.getElementById("closeDlg").onclick = function () { dlg.style.display = "none"; };
+document.getElementById("newc").onclick = function () {
+  if (art.childNodes.length > 0 && !confirm("বর্তমান কাজ মুছে যাবে। চালিয়ে যাবেন?")) return;
+  openDialog();
+};
 
 function setTool(t) {
   tool = t;
   ["select", "rect", "ellipse"].forEach(function (n) {
-    document.getElementById("t-" + n).className = (n === t) ? "on" : "";
+    document.getElementById("t-" + n).className = (n === t) ? "ib on" : "ib";
   });
 }
 
@@ -54,6 +168,7 @@ function drawOutline() {
   o.setAttribute("stroke", "#2a7de1");
   o.setAttribute("stroke-width", "2");
   o.setAttribute("stroke-dasharray", "6 4");
+  o.setAttribute("vector-effect", "non-scaling-stroke");
   o.setAttribute("pointer-events", "none");
   o.setAttribute("transform", sel.getAttribute("transform") || "");
   ui.appendChild(o);
@@ -74,6 +189,7 @@ function shape(el, x0, y0, x1, y1) {
 }
 
 svg.addEventListener("pointerdown", function (e) {
+  if (!W) return;
   var p = pt(e);
   svg.setPointerCapture(e.pointerId);
   if (tool === "select") {
@@ -104,11 +220,12 @@ svg.addEventListener("pointermove", function (e) {
   }
 });
 
-function finish(e) {
+function finish() {
   if (!drag) return;
   if (!drag.move) {
     var b = drag.el.getBBox();
-    if (b.width < 5 || b.height < 5) {
+    var minSize = 5 * W / svg.getBoundingClientRect().width;
+    if (b.width < minSize || b.height < minSize) {
       drag.el.remove();
     } else {
       setTool("select");
@@ -134,11 +251,11 @@ document.getElementById("del").onclick = function () {
 };
 
 document.getElementById("save").onclick = function () {
+  if (!W) return;
   select(null);
-  var w = svg.clientWidth, h = svg.clientHeight;
-  var out = '<svg xmlns="' + NS + '" width="' + w + '" height="' + h +
-    '" viewBox="0 0 ' + w + ' ' + h + '">' +
-    '<rect width="100%" height="100%" fill="#ffffff"/>' +
+  var out = '<svg xmlns="' + NS + '" width="' + W + '" height="' + H +
+    '" viewBox="0 0 ' + W + ' ' + H + '">' +
+    '<rect width="' + W + '" height="' + H + '" fill="#ffffff"/>' +
     art.innerHTML + '</svg>';
   var blob = new Blob([out], { type: "image/svg+xml" });
   var a = document.createElement("a");
@@ -148,6 +265,8 @@ document.getElementById("save").onclick = function () {
   a.click();
   a.remove();
 };
+
+openDialog();
 </script>
 </body>
   </html>
