@@ -3,27 +3,151 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vector Editor Test</title>
+<title>Vector Editor</title>
 <style>
-  body { margin: 0; font-family: sans-serif; }
-  p { margin: 0; padding: 12px; background: #eee; }
-  svg { display: block; width: 100vw; height: calc(100vh - 44px); touch-action: none; }
+  html, body { margin:0; height:100%; font-family:sans-serif; overflow:hidden; }
+  body { display:flex; flex-direction:column; background:#ccc; }
+  svg { flex:1; min-height:0; width:100%; background:#fff; touch-action:none; display:block; }
+  #bar { display:flex; gap:6px; padding:8px; background:#222; align-items:center; flex-wrap:wrap; }
+  button { min-width:48px; min-height:48px; padding:0 10px; font-size:15px; border:0; border-radius:8px; background:#555; color:#fff; }
+  button.on { background:#2a7de1; }
+  input[type=color] { width:48px; height:48px; border:0; padding:0; background:none; }
 </style>
 </head>
 <body>
-<p>স্ক্রিনে আঙুল দিয়ে ট্যাপ করুন, বৃত্ত আসবে।</p>
-<svg id="c"></svg>
+<svg id="c"><g id="art"></g><g id="ui"></g></svg>
+<div id="bar">
+  <button id="t-select" class="on">সিলেক্ট</button>
+  <button id="t-rect">চতুর্ভুজ</button>
+  <button id="t-ellipse">বৃত্ত</button>
+  <input type="color" id="color" value="#2a7de1">
+  <button id="del">মুছুন</button>
+  <button id="save">SVG সেভ</button>
+</div>
 <script>
-  var svg = document.getElementById("c");
-  svg.addEventListener("pointerdown", function (e) {
-    var r = svg.getBoundingClientRect();
-    var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", e.clientX - r.left);
-    circle.setAttribute("cy", e.clientY - r.top);
-    circle.setAttribute("r", 24);
-    circle.setAttribute("fill", "hsl(" + Math.floor(Math.random() * 360) + ",70%,55%)");
-    svg.appendChild(circle);
+var NS = "http://www.w3.org/2000/svg";
+var svg = document.getElementById("c");
+var art = document.getElementById("art");
+var ui = document.getElementById("ui");
+var tool = "select", color = "#2a7de1", sel = null, drag = null;
+
+function pt(e) {
+  var r = svg.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
+function setTool(t) {
+  tool = t;
+  ["select", "rect", "ellipse"].forEach(function (n) {
+    document.getElementById("t-" + n).className = (n === t) ? "on" : "";
   });
+}
+
+function drawOutline() {
+  ui.innerHTML = "";
+  if (!sel) return;
+  var b = sel.getBBox();
+  var o = document.createElementNS(NS, "rect");
+  o.setAttribute("x", b.x); o.setAttribute("y", b.y);
+  o.setAttribute("width", b.width); o.setAttribute("height", b.height);
+  o.setAttribute("fill", "none");
+  o.setAttribute("stroke", "#2a7de1");
+  o.setAttribute("stroke-width", "2");
+  o.setAttribute("stroke-dasharray", "6 4");
+  o.setAttribute("pointer-events", "none");
+  o.setAttribute("transform", sel.getAttribute("transform") || "");
+  ui.appendChild(o);
+}
+
+function select(el) { sel = el; drawOutline(); }
+
+function shape(el, x0, y0, x1, y1) {
+  var x = Math.min(x0, x1), y = Math.min(y0, y1);
+  var w = Math.abs(x1 - x0), h = Math.abs(y1 - y0);
+  if (el.tagName === "rect") {
+    el.setAttribute("x", x); el.setAttribute("y", y);
+    el.setAttribute("width", w); el.setAttribute("height", h);
+  } else {
+    el.setAttribute("cx", x + w / 2); el.setAttribute("cy", y + h / 2);
+    el.setAttribute("rx", w / 2); el.setAttribute("ry", h / 2);
+  }
+}
+
+svg.addEventListener("pointerdown", function (e) {
+  var p = pt(e);
+  svg.setPointerCapture(e.pointerId);
+  if (tool === "select") {
+    if (e.target.parentNode === art) {
+      select(e.target);
+      drag = { x: p.x, y: p.y, el: e.target, ox: e.target._tx || 0, oy: e.target._ty || 0, move: true };
+    } else {
+      select(null);
+    }
+  } else {
+    var el = document.createElementNS(NS, tool === "rect" ? "rect" : "ellipse");
+    el.setAttribute("fill", color);
+    art.appendChild(el);
+    drag = { x: p.x, y: p.y, el: el, move: false };
+  }
+});
+
+svg.addEventListener("pointermove", function (e) {
+  if (!drag) return;
+  var p = pt(e);
+  if (drag.move) {
+    drag.el._tx = drag.ox + (p.x - drag.x);
+    drag.el._ty = drag.oy + (p.y - drag.y);
+    drag.el.setAttribute("transform", "translate(" + drag.el._tx + "," + drag.el._ty + ")");
+    drawOutline();
+  } else {
+    shape(drag.el, drag.x, drag.y, p.x, p.y);
+  }
+});
+
+function finish(e) {
+  if (!drag) return;
+  if (!drag.move) {
+    var b = drag.el.getBBox();
+    if (b.width < 5 || b.height < 5) {
+      drag.el.remove();
+    } else {
+      setTool("select");
+      select(drag.el);
+    }
+  }
+  drag = null;
+}
+svg.addEventListener("pointerup", finish);
+svg.addEventListener("pointercancel", finish);
+
+document.getElementById("t-select").onclick = function () { setTool("select"); };
+document.getElementById("t-rect").onclick = function () { setTool("rect"); };
+document.getElementById("t-ellipse").onclick = function () { setTool("ellipse"); };
+
+document.getElementById("color").oninput = function (e) {
+  color = e.target.value;
+  if (sel) sel.setAttribute("fill", color);
+};
+
+document.getElementById("del").onclick = function () {
+  if (sel) { sel.remove(); select(null); }
+};
+
+document.getElementById("save").onclick = function () {
+  select(null);
+  var w = svg.clientWidth, h = svg.clientHeight;
+  var out = '<svg xmlns="' + NS + '" width="' + w + '" height="' + h +
+    '" viewBox="0 0 ' + w + ' ' + h + '">' +
+    '<rect width="100%" height="100%" fill="#ffffff"/>' +
+    art.innerHTML + '</svg>';
+  var blob = new Blob([out], { type: "image/svg+xml" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "drawing.svg";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};
 </script>
 </body>
-</html>
+  </html>
