@@ -5,43 +5,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Vector Editor</title>
 <style>
-:root{--bg:#323232;--pn:#3d3d3d;--ln:#232323;--tx:#e0e0e0;--mu:#999;--ac:#2d8cf0}
+:root{--bg:#323232;--ln:#232323;--tx:#e0e0e0;--mu:#999;--ac:#2d8cf0}
 html,body{margin:0;height:100%;overflow:hidden;background:#262626;color:var(--tx);font:12px system-ui,sans-serif;-webkit-user-select:none;user-select:none}
 body{display:flex;flex-direction:column}
 button,input,select{font:inherit;color:var(--tx)}
 #tops{display:flex;background:var(--bg);border-bottom:1px solid var(--ln);overflow-x:auto;flex:0 0 auto}
-.bar{display:flex;align-items:center;gap:6px;padding:4px 8px;white-space:nowrap;flex:0 0 auto}
+.bar{display:flex;align-items:center;gap:6px;padding:3px 8px;white-space:nowrap;flex:0 0 auto}
 .bar+.bar{border-left:1px solid var(--ln)}
-.sw{position:relative;width:26px;height:26px;border:2px solid #888;box-sizing:border-box;overflow:hidden}
+.sw{position:relative;width:24px;height:24px;border:2px solid #888;box-sizing:border-box;overflow:hidden}
 .sw input{position:absolute;left:-6px;top:-6px;width:40px;height:40px;border:0;padding:0;background:none}
 .sw.none::after{content:"";position:absolute;inset:0;background:linear-gradient(to top right,#fff 46%,#e33 46%,#e33 54%,#fff 54%);pointer-events:none}
-.n{width:46px;height:26px;box-sizing:border-box;background:#222;border:1px solid #555;text-align:center}
-.b{width:30px;height:30px;border:0;background:transparent;padding:3px;border-radius:4px;flex:0 0 auto}
+.n{width:46px;height:24px;box-sizing:border-box;background:#222;border:1px solid #555;text-align:center}
+.b{width:28px;height:28px;border:0;background:transparent;padding:3px;border-radius:4px;flex:0 0 auto}
 .b svg{width:100%;height:100%}
 .b.on{background:var(--ac)}
 .off{opacity:.35}
 #mid{flex:1;min-height:0;display:flex}
-#tb{flex:0 0 78px;background:var(--bg);border-right:1px solid var(--ln);overflow-y:auto;display:grid;grid-template-columns:34px 34px;gap:2px;padding:4px;align-content:start;justify-content:center}
-#tb .b{width:34px;height:34px}
-#tb .full{grid-column:1/3;display:flex;gap:6px;align-items:center;justify-content:center;padding:4px 0}
+#tb{flex:0 0 76px;background:var(--bg);border-right:1px solid var(--ln);overflow-y:auto;display:grid;grid-template-columns:32px 32px;gap:2px;padding:4px;align-content:start;justify-content:center}
+#tb .b{width:32px;height:32px}
+#tb .full{grid-column:1/3;display:flex;gap:6px;align-items:center;justify-content:center;padding:3px 0}
 .box{width:22px;height:22px;border:2px solid #aaa;box-sizing:border-box}
 #stage{flex:1;min-width:0;display:flex;overflow:auto;background:#535353}
 #c{margin:auto;background:#fff;touch-action:none;flex:0 0 auto}
-#rp{flex:0 0 190px;background:var(--bg);border-left:1px solid var(--ln);overflow-y:auto}
-.pn{border-bottom:1px solid var(--ln);padding:6px}
-.tabs{display:flex;gap:10px;color:var(--mu);margin-bottom:6px}.tabs b{color:var(--tx)}
-.row{display:flex;gap:4px;margin:3px 0;align-items:center}
+#rp{flex:0 0 150px;background:var(--bg);border-left:1px solid var(--ln);overflow-y:auto}
+#rp.hide{display:none}
+.pn{border-bottom:1px solid var(--ln);padding:5px}
+.tabs{display:flex;gap:8px;color:var(--mu);margin-bottom:4px}.tabs b{color:var(--tx)}
+.row{display:flex;gap:3px;margin:3px 0}
 .row input,.row select{flex:1;min-width:0;height:22px;background:#222;border:1px solid #555}
-#hl{max-height:96px;overflow-y:auto;margin-top:4px}
-#hl div{padding:5px 6px;border-bottom:1px solid #2b2b2b;background:#464646}
+#hl{max-height:80px;overflow-y:auto;margin-top:3px}
+#hl div{padding:4px 6px;border-bottom:1px solid #2b2b2b;background:#464646}
 #hl div:last-child{background:#555}
-#it{width:100%;height:30px;background:#3a3a3a;border:1px solid #666;margin-bottom:4px}
-#bot{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:3px 8px;background:var(--bg);border-top:1px solid var(--ln)}
-#bot .t{height:26px;padding:0 10px;background:#444;border:0;border-radius:4px}
+#it{width:100%;height:28px;background:#3a3a3a;border:1px solid #666}
+#bot{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:2px 8px;background:var(--bg);border-top:1px solid var(--ln)}
+.t{height:24px;padding:0 8px;background:#444;border:0;border-radius:4px}
 #msg{flex:1;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#dlg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9}
+#box{background:#2b2b2b;padding:12px;border-radius:10px;width:420px;max-width:94vw;max-height:94vh;overflow:auto}
+#box h3{margin:0 0 8px;font-size:15px}
+#box .row{align-items:end}#box label{display:block;color:var(--mu);margin:2px 0}
+#box .row>div{flex:1}#box input,#box select{width:100%;box-sizing:border-box;height:34px;font-size:15px;background:#1b1b1b;border:1px solid #666;padding:0 8px;border-radius:6px}
+#pre button{flex:1;height:32px;background:#444;border:0;border-radius:6px}
+#ok{width:100%;height:38px;margin-top:8px;border:0;border-radius:8px;background:var(--ac);color:#fff;font-size:15px}
+#rotmsg{display:none;position:fixed;inset:0;z-index:20;background:#262626;align-items:center;justify-content:center;font-size:20px;text-align:center;padding:20px}
+@media (orientation:portrait){#rotmsg{display:flex}}
 </style>
 </head>
 <body>
+<div id="rotmsg">ফোনটা আড়াআড়ি (Landscape) করুন।<br>অটো-রোটেট চালু আছে কি না দেখুন।</div>
 <div id="tops">
  <div class="bar">
   <div class="sw" id="fs"><input type="color" id="fill" value="#2a7de1"></div><button class="b" id="fn"></button>
@@ -51,7 +62,7 @@ button,input,select{font:inherit;color:var(--tx)}
   <span>Opacity:</span><input class="n" type="number" id="op" min="0" max="100" value="100">
   <span class="off">Style:</span><div class="sw off"></div>
  </div>
- <div class="bar" id="b2">
+ <div class="bar">
   <span id="alg" style="display:flex;gap:2px"></span>
   <button class="b off" id="dist"></button>
   <span>X:</span><input class="n" id="X" type="number">
@@ -62,37 +73,39 @@ button,input,select{font:inherit;color:var(--tx)}
 </div>
 <div id="mid">
  <div id="tb"></div>
- <div id="stage"><svg id="c" viewBox="0 0 1000 700"><rect width="1000" height="700" fill="#fff"/><g id="art"></g><g id="ui"></g></svg></div>
+ <div id="stage"><svg id="c"><rect id="bg" fill="#fff"/><g id="art"></g><g id="ui"></g></svg></div>
  <div id="rp">
-  <div class="pn off">
+  <div class="pn">
    <div class="tabs"><b>Character</b><span>Paragraph</span><span>OpenType</span></div>
-   <div class="row"><input value="System UI" disabled></div>
-   <div class="row"><input value="Regular" disabled></div>
-   <div class="row"><input value="12 pt" disabled><input value="(14.4 pt)" disabled></div>
-   <div class="row"><input value="Auto" disabled><input value="0" disabled></div>
-   <div>Snap to Glyph</div>
-   <div class="row"><button class="b">Ax</button><button class="b">Ax̶</button><button class="b">Ag</button><button class="b">A</button></div>
+   <div class="row"><select id="ff"><option value="sans-serif">Sans</option><option value="serif">Serif</option><option value="monospace">Mono</option></select></div>
+   <div class="row off"><input value="Regular" disabled></div>
+   <div class="row"><input id="fsz" type="number" value="48" min="4" max="600"><input class="off" value="(auto)" disabled></div>
+   <div class="row off"><input value="Auto" disabled><input value="0" disabled></div>
+   <div class="off">Snap to Glyph</div>
   </div>
   <div class="pn"><b>History</b><div id="hl"></div></div>
-  <div class="pn off"><button id="it">Image Trace</button>
-   <select class="row" style="width:100%" disabled><option>Custom</option><option>[Default]</option><option>High Fidelity Photo</option><option>Low Fidelity Photo</option><option>3 Colors</option><option>6 Colors</option><option>16 Colors</option><option>Shades of Gray</option><option>Black and White Logo</option><option>Sketched Art</option><option>Silhouettes</option><option>Line Art</option><option>Technical Drawing</option></select>
-  </div>
+  <div class="pn off"><button id="it">Image Trace</button></div>
  </div>
 </div>
 <div id="bot">
- <span id="msg"></span>
+ <button class="t" id="info"></button><span id="msg"></span>
  <button class="t off" id="grp">Group</button><button class="t off" id="ung">Ungroup</button>
  <button class="b" id="zo"></button><button class="t" id="zf">100%</button><button class="b" id="zi"></button>
- <button class="b" id="save"></button>
+ <button class="t" id="pt">প্যানেল</button><button class="b" id="save"></button>
 </div>
+<div id="dlg"><div id="box">
+ <h3>নতুন ক্যানভাস: কত সাইজ নেবেন?</h3>
+ <div class="row" id="pre"><button data-a="1080,1080,72">1080×1080</button><button data-a="1920,1080,72">1920×1080</button><button data-a="2480,3508,300">A4 300</button></div>
+ <div class="row"><div><label>প্রস্থ (px)</label><input id="cw" type="number" value="1080"></div><div><label>উচ্চতা (px)</label><input id="ch" type="number" value="1080"></div><div><label>PPI</label><select id="cp"><option>72</option><option>150</option><option>300</option></select></div></div>
+ <button id="ok">তৈরি করুন</button>
+</div></div>
 <script>
 var NS="http://www.w3.org/2000/svg",$=function(i){return document.getElementById(i)};
-var svg=$("c"),art=$("art"),ui=$("ui"),stage=$("stage"),W=1000,H=700,zoom=1,tool="sel",shapeIx=0,sel=null,drag=null,hist=[],tmr;
-var SH=["rect","ellipse","line","polygon","star"];
+var svg=$("c"),art=$("art"),ui=$("ui"),bg=$("bg"),stage=$("stage"),W=1080,H=1080,PPI=72,zoom=1,tool="sel",shapeIx=0,sel=null,drag=null,hist=[],tmr,penEl=null,penPts=null;
+var SH=["rect","ellipse","line","polygon","star"],SHN=["চতুর্ভুজ","বৃত্ত","লাইন","পলিগন","স্টার"];
 var st={fill:"#2a7de1",fN:false,stroke:"#000000",sN:false,sw:2,op:100};
 var I={
-sel:'<path d="M6 3l12 9-5 1.5 3 6-2.5 1-3-6L6 18z"/>',
-dsel:'<path fill="currentColor" d="M6 3l12 9-5 1.5 3 6-2.5 1-3-6L6 18z"/>',
+sel:'<path d="M6 3l12 9-5 1.5 3 6-2.5 1-3-6L6 18z"/>',dsel:'<path fill="currentColor" d="M6 3l12 9-5 1.5 3 6-2.5 1-3-6L6 18z"/>',
 pen:'<path d="M12 2l6 9-4 7h-4l-4-7z"/><circle cx="12" cy="13" r="1.5"/>',
 rect:'<rect x="4" y="6" width="16" height="12"/>',ellipse:'<ellipse cx="12" cy="12" rx="9" ry="6"/>',line:'<path d="M5 19L19 5"/>',
 polygon:'<path d="M12 3l8 5v8l-8 5-8-5V8z"/>',star:'<path d="M12 3l2.7 5.8 6.3.8-4.6 4.4 1.2 6.3-5.6-3-5.6 3 1.2-6.3L3 9.6l6.3-.8z"/>',
@@ -108,41 +121,56 @@ save:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',dist:'<path d="M4 4v16M20 4v16M
 al0:'<path d="M4 4v16M8 7h10M8 14h6"/>',al1:'<path d="M12 4v16M6 7h12M8 14h8"/>',al2:'<path d="M20 4v16M6 7h10M10 14h6"/>',
 al3:'<path d="M4 4h16M7 8v10M14 8v6"/>',al4:'<path d="M4 12h16M7 6v12M14 8v8"/>',al5:'<path d="M4 20h16M7 6v10M14 10v6"/>'};
 function ic(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+I[n]+'</svg>'}
-function say(t){$("msg").textContent=t;clearTimeout(tmr);tmr=setTimeout(function(){$("msg").textContent=""},2500)}
-function soon(){say("এই টুল এখনো বানানো হয়নি")}
+function say(t){$("msg").textContent=t;clearTimeout(tmr);tmr=setTimeout(function(){$("msg").textContent=""},3000)}
 
 /* toolbar */
-var TL=[["sel",1],["dsel",0],["pen",0],["rect",1],["brush",0],["type",0],["rot",0],["eraser",1],["ftr",0],["grad",0],["blend",0],["eyed",1],["symb",0],["shpb",0],["abrd",0],["graph",0],["zoom",1]];
+var TL=[["sel",1],["dsel",0],["pen",1],["rect",1],["brush",1],["type",1],["rot",1],["eraser",1],["ftr",0],["grad",0],["blend",0],["eyed",1],["symb",0],["shpb",0],["abrd",1],["graph",0],["zoom",1]];
 TL.forEach(function(t){var b=document.createElement("button");b.id="t-"+t[0];b.className="b"+(t[1]?"":" off");b.innerHTML=ic(t[0]);
- b.onclick=function(){if(!t[1]){soon();return}
+ b.onclick=function(){if(!t[1]){say("এই টুল এখনো বানানো হয়নি");return}
+  if(t[0]==="abrd"){openDlg();return}
+  if(t[0]==="pen"&&tool==="pen"){endPen();return}
   if(t[0]==="rect"&&tool==="rect"){shapeIx=(shapeIx+1)%SH.length;$("t-rect").innerHTML=ic(SH[shapeIx])}
   setTool(t[0])};$("tb").appendChild(b)});
-var ex=document.createElement("div");ex.className="full";
-ex.innerHTML='<div class="box" id="bf"></div><div class="box" id="bs" style="margin-left:-10px"></div>';$("tb").appendChild(ex);
-var r2=document.createElement("div");r2.className="full";
-[["sw0","⇄"],["df","▣"],["nn","∅"]].forEach(function(x){var b=document.createElement("button");b.className="b";b.textContent=x[1];b.id=x[0];r2.appendChild(b)});$("tb").appendChild(r2);
-var r3=document.createElement("div");r3.className="full off";r3.textContent="⋯";$("tb").appendChild(r3);
-function setTool(t){tool=t;TL.forEach(function(x){$("t-"+x[0]).classList.toggle("on",x[0]===t)});say(t==="rect"?"आकार: "+SH[shapeIx]:t)}
+function mk(c,h){var d=document.createElement("div");d.className=c;d.innerHTML=h;$("tb").appendChild(d)}
+mk("full",'<div class="box" id="bf"></div><div class="box" id="bs" style="margin-left:-10px"></div>');
+mk("full",'<button class="b" id="sw0">⇄</button><button class="b" id="df">▣</button>');
+mk("full off","⋯");
+function setTool(t){if(tool==="pen"&&t!=="pen")endPen();tool=t;TL.forEach(function(x){$("t-"+x[0]).classList.toggle("on",x[0]===t)});
+ say(t==="rect"?"আকার: "+SHN[shapeIx]+" (আবার ট্যাপ করলে বদলায়)":t==="pen"?"পয়েন্টে ট্যাপ করুন; শেষ করতে আবার পেন আইকনে ট্যাপ":t==="type"?"ক্যানভাসে ট্যাপ করে লিখুন":t==="rot"?"আকার সিলেক্ট করে আঙুল ঘোরান":"")}
 $("t-sel").classList.add("on");
 $("fn").innerHTML=ic("none");$("sn").innerHTML=ic("none");$("dist").innerHTML=ic("dist");
 $("zo").innerHTML=ic("minus");$("zi").innerHTML=ic("plus");$("save").innerHTML=ic("save");
 for(var k=0;k<6;k++){(function(k){var b=document.createElement("button");b.className="b";b.innerHTML=ic("al"+k);b.onclick=function(){align(k)};$("alg").appendChild(b)})(k)}
-$("dist").onclick=soon;$("grp").onclick=soon;$("ung").onclick=soon;$("it").onclick=soon;
+$("dist").onclick=$("grp").onclick=$("ung").onclick=$("it").onclick=function(){say("এই টুল এখনো বানানো হয়নি")};
+$("pt").onclick=function(){$("rp").classList.toggle("hide");layout()};
+
+/* canvas dialog */
+function openDlg(){$("cw").value=W;$("ch").value=H;$("cp").value=PPI;$("dlg").style.display="flex"}
+[].forEach.call($("pre").children,function(b){b.onclick=function(){var a=b.getAttribute("data-a").split(",");$("cw").value=a[0];$("ch").value=a[1];$("cp").value=a[2]}});
+$("ok").onclick=function(){var w=+$("cw").value,h=+$("ch").value;if(!(w>=16&&w<=8000&&h>=16&&h<=8000)){alert("সাইজ ১৬ থেকে ৮০০০ এর মধ্যে দিন");return}
+ W=w;H=h;PPI=+$("cp").value;svg.setAttribute("viewBox","0 0 "+W+" "+H);bg.setAttribute("width",W);bg.setAttribute("height",H);
+ art.innerHTML="";sel=null;penEl=null;hist=[];zoom=1;push("New");select(null);layout();$("dlg").style.display="none"};
+$("info").onclick=openDlg;
 
 /* layout & zoom */
-function layout(){var r=stage.getBoundingClientRect(),s=Math.min((r.width-20)/W,(r.height-20)/H)*zoom;svg.style.width=W*s+"px";svg.style.height=H*s+"px";$("zf").textContent=Math.round(zoom*100)+"%"}
+function layout(){var r=stage.getBoundingClientRect(),s=Math.min((r.width-12)/W,(r.height-12)/H)*zoom;svg.style.width=W*s+"px";svg.style.height=H*s+"px";
+ $("zf").textContent=Math.round(zoom*100)+"%";$("info").textContent=W+" × "+H+" px · "+PPI+" PPI"}
 function scale(){return W/svg.getBoundingClientRect().width}
 function pt(e){var r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
 window.addEventListener("resize",layout);
 function setZ(z){zoom=Math.max(.25,Math.min(8,z));layout();drawOutline()}
 $("zi").onclick=function(){setZ(zoom*1.5)};$("zo").onclick=function(){setZ(zoom/1.5)};$("zf").onclick=function(){setZ(1)};
 
-/* style state */
+/* style */
 function refresh(){$("fill").value=st.fill;$("stroke").value=st.stroke;$("fs").className="sw"+(st.fN?" none":"");$("ss").className="sw"+(st.sN?" none":"");
  $("sw").value=st.sw;$("op").value=st.op;$("bf").style.background=st.fN?"#fff":st.fill;$("bs").style.background="#222";$("bs").style.borderColor=st.sN?"#777":st.stroke}
-function applyTo(el){if(!el)return;el.setAttribute("fill",el._type==="line"||st.fN?"none":st.fill);el.setAttribute("stroke",st.sN?"none":st.stroke);el.setAttribute("stroke-width",st.sw);el.setAttribute("opacity",st.op/100)}
-function load(el){var f=el.getAttribute("fill"),s=el.getAttribute("stroke");if(el._type!=="line"){st.fN=f==="none";if(f&&f!=="none")st.fill=f}
- st.sN=!s||s==="none";if(s&&s!=="none")st.stroke=s;var w=parseFloat(el.getAttribute("stroke-width")),o=parseFloat(el.getAttribute("opacity"));if(!isNaN(w))st.sw=w;if(!isNaN(o))st.op=Math.round(o*100);refresh()}
+function noFill(el){return el._type==="line"||(el._type==="path"&&!el._closed)}
+function applyTo(el){if(!el)return;var t=el._type==="text";
+ el.setAttribute("fill",noFill(el)||(st.fN&&!t)?"none":st.fill);
+ el.setAttribute("stroke",t||st.sN?"none":st.stroke);el.setAttribute("stroke-width",st.sw);el.setAttribute("opacity",st.op/100)}
+function load(el){var f=el.getAttribute("fill"),s=el.getAttribute("stroke");if(!noFill(el)){st.fN=f==="none";if(f&&f!=="none")st.fill=f}
+ if(el._type!=="text"){st.sN=!s||s==="none";if(s&&s!=="none")st.stroke=s}
+ var w=parseFloat(el.getAttribute("stroke-width")),o=parseFloat(el.getAttribute("opacity"));if(!isNaN(w))st.sw=w;if(!isNaN(o))st.op=Math.round(o*100);refresh()}
 function chg(){applyTo(sel);drawOutline()}
 function commit(){if(sel)push("Style")}
 $("fill").oninput=function(e){st.fill=e.target.value;st.fN=false;refresh();chg()};
@@ -150,31 +178,32 @@ $("stroke").oninput=function(e){st.stroke=e.target.value;st.sN=false;refresh();c
 $("fill").onchange=$("stroke").onchange=commit;
 $("fn").onclick=function(){st.fN=!st.fN;refresh();chg();commit()};
 $("sn").onclick=function(){st.sN=!st.sN;refresh();chg();commit()};
-$("nn").onclick=$("fn").onclick;
 $("sw").onchange=function(e){st.sw=Math.max(0,Math.min(500,+e.target.value||0));refresh();chg();commit()};
 $("op").onchange=function(e){st.op=Math.max(0,Math.min(100,+e.target.value||0));refresh();chg();commit()};
 $("sw0").onclick=function(){var a=st.fill;st.fill=st.stroke;st.stroke=a;st.fN=st.sN=false;refresh();chg();commit()};
 $("df").onclick=function(){st.fill="#ffffff";st.stroke="#000000";st.fN=st.sN=false;refresh();chg();commit()};
 
 /* history */
-function rehydrate(){[].forEach.call(art.children,function(el){el._type=el.getAttribute("data-t");var m=/translate\(([-\d.e]+),([-\d.e]+)\)/.exec(el.getAttribute("transform")||"");el._tx=m?+m[1]:0;el._ty=m?+m[2]:0})}
-function push(n){hist.push({n:n,h:art.innerHTML});if(hist.length>40)hist.shift();showHist()}
-function showHist(){var l=$("hl");l.innerHTML="";hist.forEach(function(x,i){var d=document.createElement("div");d.textContent=x.n;d.onclick=function(){art.innerHTML=x.h;rehydrate();select(null);hist.length=i+1;showHist()};l.appendChild(d)});l.scrollTop=l.scrollHeight}
+function rehydrate(){[].forEach.call(art.children,function(el){el._type=el.getAttribute("data-t");var tr=el.getAttribute("transform")||"",m=/translate\(([-\d.e]+),([-\d.e]+)\)/.exec(tr),q=/rotate\(([-\d.e]+) ([-\d.e]+) ([-\d.e]+)\)/.exec(tr);
+ el._tx=m?+m[1]:0;el._ty=m?+m[2]:0;el._r=q?+q[1]:0;el._cx=q?+q[2]:0;el._cy=q?+q[3]:0;el._closed=/Z$/.test(el.getAttribute("d")||"")})}
+function push(n){hist.push({n:n,h:art.innerHTML});if(hist.length>40)hist.shift();renderHist()}
+function renderHist(){var l=$("hl");l.innerHTML="";hist.forEach(function(x,i){var d=document.createElement("div");d.textContent=x.n;
+ d.onclick=function(){art.innerHTML=x.h;rehydrate();select(null);hist.length=i+1;renderHist()};l.appendChild(d)});l.scrollTop=l.scrollHeight}
 
-/* selection */
+/* selection & transform */
+function tr(el){var s="translate("+(el._tx||0)+","+(el._ty||0)+")";if(el._r)s+=" rotate("+el._r+" "+el._cx+" "+el._cy+")";el.setAttribute("transform",s)}
 function drawOutline(){ui.innerHTML="";updXY();if(!sel)return;var b=sel.getBBox(),p=6*scale(),o=document.createElementNS(NS,"rect");
  o.setAttribute("x",b.x-p);o.setAttribute("y",b.y-p);o.setAttribute("width",b.width+2*p);o.setAttribute("height",b.height+2*p);
  o.setAttribute("fill","none");o.setAttribute("stroke","#2d8cf0");o.setAttribute("stroke-width","2");o.setAttribute("stroke-dasharray","6 4");
  o.setAttribute("vector-effect","non-scaling-stroke");o.setAttribute("pointer-events","none");o.setAttribute("transform",sel.getAttribute("transform")||"");ui.appendChild(o)}
 function select(el){sel=el;if(el)load(el);drawOutline()}
-function setT(el,x,y){el._tx=x;el._ty=y;el.setAttribute("transform","translate("+x+","+y+")")}
 function updXY(){if(!sel){$("X").value=$("Y").value=$("Wf").value=$("Hf").value="";return}var b=sel.getBBox();
  $("X").value=Math.round(b.x+(sel._tx||0));$("Y").value=Math.round(b.y+(sel._ty||0));$("Wf").value=Math.round(b.width);$("Hf").value=Math.round(b.height)}
-$("X").onchange=function(e){if(!sel)return;var b=sel.getBBox();setT(sel,+e.target.value-b.x,sel._ty||0);drawOutline();push("Move")};
-$("Y").onchange=function(e){if(!sel)return;var b=sel.getBBox();setT(sel,sel._tx||0,+e.target.value-b.y);drawOutline();push("Move")};
-function align(k){if(!sel){say("আগে একটা আকার সিলেক্ট করুন");return}var b=sel.getBBox(),x=sel._tx||0,y=sel._ty||0;
- if(k===0)x=-b.x;if(k===1)x=W/2-b.x-b.width/2;if(k===2)x=W-b.x-b.width;
- if(k===3)y=-b.y;if(k===4)y=H/2-b.y-b.height/2;if(k===5)y=H-b.y-b.height;setT(sel,x,y);drawOutline();push("Align")}
+$("X").onchange=function(e){if(!sel)return;sel._tx=+e.target.value-sel.getBBox().x;tr(sel);drawOutline();push("Move")};
+$("Y").onchange=function(e){if(!sel)return;sel._ty=+e.target.value-sel.getBBox().y;tr(sel);drawOutline();push("Move")};
+function align(k){if(!sel){say("আগে একটা আকার সিলেক্ট করুন");return}var b=sel.getBBox();
+ if(k===0)sel._tx=-b.x;if(k===1)sel._tx=W/2-b.x-b.width/2;if(k===2)sel._tx=W-b.x-b.width;
+ if(k===3)sel._ty=-b.y;if(k===4)sel._ty=H/2-b.y-b.height/2;if(k===5)sel._ty=H-b.y-b.height;tr(sel);drawOutline();push("Align")}
 
 /* shapes */
 function make(t){var el=document.createElementNS(NS,t==="star"?"polygon":t);el._type=t;el.setAttribute("data-t",t);el.setAttribute("pointer-events","all");
@@ -184,23 +213,39 @@ function shape(el,x0,y0,x1,y1){var t=el._type,x=Math.min(x0,x1),y=Math.min(y0,y1
  if(t==="rect"){el.setAttribute("x",x);el.setAttribute("y",y);el.setAttribute("width",w);el.setAttribute("height",h)}
  else if(t==="ellipse"){el.setAttribute("cx",x+w/2);el.setAttribute("cy",y+h/2);el.setAttribute("rx",w/2);el.setAttribute("ry",h/2)}
  else if(t==="line"){el.setAttribute("x1",x0);el.setAttribute("y1",y0);el.setAttribute("x2",x1);el.setAttribute("y2",y1)}
- else{var r=Math.sqrt(w*w+h*h);el.setAttribute("points",poly(x0,y0,r,t==="star"?5:6,t==="star"))}}
+ else{el.setAttribute("points",poly(x0,y0,Math.sqrt(w*w+h*h),t==="star"?5:6,t==="star"))}}
 function dseg(px,py,x1,y1,x2,y2){var dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy,t=l?((px-x1)*dx+(py-y1)*dy)/l:0;t=Math.max(0,Math.min(1,t));return Math.hypot(px-x1-t*dx,py-y1-t*dy)}
 function pick(e,p){var t=e.target;if(t&&t.parentNode===art)return t;var tol=16*scale();
  for(var i=art.children.length-1;i>=0;i--){var el=art.children[i];if(el._type!=="line")continue;
   if(dseg(p.x-(el._tx||0),p.y-(el._ty||0),+el.getAttribute("x1"),+el.getAttribute("y1"),+el.getAttribute("x2"),+el.getAttribute("y2"))<=tol)return el}return null}
+function pathD(a,z){return "M"+a.map(function(q){return q.x.toFixed(1)+" "+q.y.toFixed(1)}).join(" L")+(z?" Z":"")}
+function endPen(z){if(!penEl)return;if(penPts.length<2)penEl.remove();else{if(z){penEl._closed=true;penEl.setAttribute("d",pathD(penPts,true));applyTo(penEl)}select(penEl);push("Pen")}penEl=null;penPts=null;if(tool==="pen")say("")}
 
 /* pointer */
 svg.addEventListener("pointerdown",function(e){var p=pt(e),el;svg.setPointerCapture(e.pointerId);
  if(tool==="zoom"){setZ(zoom*1.5);return}
- if(tool==="sel"){el=pick(e,p);if(el){select(el);drag={x:p.x,y:p.y,el:el,ox:el._tx||0,oy:el._ty||0,mv:true,moved:false}}else select(null);return}
+ if(tool==="sel"){el=pick(e,p);if(el){select(el);drag={x:p.x,y:p.y,el:el,ox:el._tx||0,oy:el._ty||0,mv:true}}else select(null);return}
  if(tool==="eraser"){el=pick(e,p);if(el){el.remove();select(null);push("Erase")}return}
  if(tool==="eyed"){el=pick(e,p);if(el){load(el);if(sel){applyTo(sel);drawOutline();push("Style")}say("রং তোলা হয়েছে")}return}
- if(tool==="rect"){var ty=SH[shapeIx];if(ty==="line"&&st.sN){st.sN=false;refresh()}el=make(ty);applyTo(el);art.appendChild(el);drag={x:p.x,y:p.y,el:el,mv:false}}});
+ if(tool==="rot"){el=pick(e,p)||sel;if(!el){say("আগে একটা আকার সিলেক্ট করুন");return}select(el);var b=el.getBBox();
+  if(!el._r){el._cx=b.x+b.width/2;el._cy=b.y+b.height/2}
+  var cx=el._cx+(el._tx||0),cy=el._cy+(el._ty||0);drag={rot:true,el:el,cx:cx,cy:cy,a0:Math.atan2(p.y-cy,p.x-cx),r0:el._r||0};return}
+ if(tool==="type"){var s=prompt("লেখা লিখুন:");if(!s)return;el=make("text");el.setAttribute("data-t","text");el.setAttribute("x",p.x);el.setAttribute("y",p.y);
+  el.setAttribute("font-size",$("fsz").value||48);el.setAttribute("font-family",$("ff").value);el.textContent=s;el.removeAttribute("stroke-linejoin");applyTo(el);art.appendChild(el);select(el);push("Type");return}
+ if(tool==="pen"){if(!penEl){penEl=make("path");penPts=[];applyTo(penEl);art.appendChild(penEl)}
+  else if(penPts.length>2&&Math.hypot(p.x-penPts[0].x,p.y-penPts[0].y)<14*scale()){endPen(true);return}
+  penPts.push(p);penEl.setAttribute("d",pathD(penPts));return}
+ if(tool==="brush"){el=make("path");applyTo(el);art.appendChild(el);drag={el:el,pts:[p],br:true};el.setAttribute("d",pathD(drag.pts));return}
+ if(tool==="rect"){var ty=SH[shapeIx];if(ty==="line"&&st.sN){st.sN=false;refresh()}el=make(ty);applyTo(el);art.appendChild(el);drag={x:p.x,y:p.y,el:el}}});
 svg.addEventListener("pointermove",function(e){if(!drag)return;var p=pt(e);
- if(drag.mv){drag.moved=true;setT(drag.el,drag.ox+p.x-drag.x,drag.oy+p.y-drag.y);drawOutline()}else shape(drag.el,drag.x,drag.y,p.x,p.y)});
+ if(drag.mv){drag.el._tx=drag.ox+p.x-drag.x;drag.el._ty=drag.oy+p.y-drag.y;tr(drag.el);drawOutline()}
+ else if(drag.rot){drag.el._r=drag.r0+(Math.atan2(p.y-drag.cy,p.x-drag.cx)-drag.a0)*180/Math.PI;tr(drag.el);drawOutline()}
+ else if(drag.br){drag.pts.push(p);drag.el.setAttribute("d",pathD(drag.pts))}
+ else shape(drag.el,drag.x,drag.y,p.x,p.y)});
 function done(){if(!drag)return;var el=drag.el;
- if(drag.mv){if(drag.moved)push("Move")}
+ if(drag.mv){if(el._tx!==drag.ox||el._ty!==drag.oy)push("Move")}
+ else if(drag.rot){push("Rotate")}
+ else if(drag.br){if(drag.pts.length<3)el.remove();else{select(el);push("Brush")}}
  else{var m=6*scale(),tiny;if(el._type==="line"){tiny=Math.hypot(+el.getAttribute("x2")-+el.getAttribute("x1"),+el.getAttribute("y2")-+el.getAttribute("y1"))<m}
   else{var b=el.getBBox();tiny=b.width<m||b.height<m}
   if(tiny)el.remove();else{select(el);push("Draw")}}
@@ -208,11 +253,11 @@ function done(){if(!drag)return;var el=drag.el;
 svg.addEventListener("pointerup",done);svg.addEventListener("pointercancel",done);
 
 /* save */
-$("save").onclick=function(){select(null);var c=art.cloneNode(true);[].forEach.call(c.children,function(el){el.removeAttribute("pointer-events");el.removeAttribute("data-t")});
+$("save").onclick=function(){endPen();select(null);var c=art.cloneNode(true);[].forEach.call(c.children,function(el){el.removeAttribute("pointer-events");el.removeAttribute("data-t")});
  var o='<svg xmlns="'+NS+'" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'"><rect width="'+W+'" height="'+H+'" fill="#fff"/>'+c.innerHTML+'</svg>';
  var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([o],{type:"image/svg+xml"}));a.download="drawing.svg";document.body.appendChild(a);a.click();a.remove()};
 
-refresh();layout();push("New");
+refresh();$("ok").onclick();$("dlg").style.display="flex";
 </script>
 </body>
 </html>
